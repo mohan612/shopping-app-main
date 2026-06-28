@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shoppie-frontend
+  namespace: shoppie
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shoppie-frontend
+  template:
+    metadata:
+      labels:
+        app: shoppie-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: acdemoacr001.azurecr.io/shoppie-frontend:latest
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shoppie-frontend
+  namespace: shoppie
+spec:
+  selector:
+    app: shoppie-frontend
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP
